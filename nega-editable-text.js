@@ -71,6 +71,23 @@ class NegaEditableText extends  LitElement {
 
   updated(changed) {
     if (changed.has('editable')) {
+      if (this.editable) {
+        // Allow focusable
+        if (this.contentElement.tabIndex) {
+          this._textTabIndex = this.contentElement.tabIndex
+        }
+        this.contentElement.tabIndex = 0
+      } else {
+        // Restore focusable
+        if (this._textTabIndex) {
+          this.contentElement.tabIndex = this._textTabIndex
+        } else {
+          this.contentElement.removeAttribute('tabindex')
+        }
+        
+        this.contentElement.blur()
+      }
+
       this.contentElement.contentEditable = this.editable
     }
   }
@@ -79,27 +96,16 @@ class NegaEditableText extends  LitElement {
    * Edit the text.
    */
   edit() {
-    // Allow focusable
-    if (this.contentElement.tabIndex) {
-      this._textTabIndex = this.contentElement.tabIndex
-    }
-    this.contentElement.tabIndex = 0
-
     this.editable = true
+
+    this.dispatchEvent(new CustomEvent('edit', {detail: {value: this.innerText, target: this.contentElement}, composed: true, bubbles: true}))
   }
 
   /**
    * Finished editing.
    */
   doneEditing() {
-    // Restore focusable
-    if (this._textTabIndex) {
-      this.contentElement.tabIndex = this._textTabIndex
-    } else {
-      this.contentElement.removeAttribute('tabindex')
-    }
     this.editable = false
-    this.contentElement.blur()
 
     this.dispatchEvent(new CustomEvent('change', {detail: {value: this.innerText, target: this.contentElement}, composed: true, bubbles: true}))
   }
