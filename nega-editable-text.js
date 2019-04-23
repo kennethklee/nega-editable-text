@@ -76,6 +76,7 @@ class NegaEditableText extends  LitElement {
    */
   edit() {
     if (this.readOnly) return;
+    if (!this.contentElement) return;
     
     // Allow focusable
     if (this.contentElement.hasAttribute('tabIndex')) {

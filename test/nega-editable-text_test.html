@@ -15,10 +15,21 @@
     <script type="module" src="../nega-editable-text.js"></script>
   </head>
   <body>
-
     <test-fixture id="BasicTestFixture">
       <template>
         <nega-editable-text></nega-editable-text>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="EditableTestFixture">
+      <template>
+        <nega-editable-text><span id="editable">editable</span></nega-editable-text>
+      </template>
+    </test-fixture>
+  
+    <test-fixture id="ReadOnlyTestFixture">
+      <template>
+        <nega-editable-text readonly><span id="readonly">editable</span></nega-editable-text>
       </template>
     </test-fixture>
 
@@ -28,6 +39,47 @@
           const element = fixture('BasicTestFixture')
 
           expect(element.editable).to.be.false
+          expect(element.readOnly).to.be.false
+        })
+
+        describe('edit()', () => {
+          it('renders the content editable', async () => {
+            const element = fixture('EditableTestFixture')
+            const editableText = element.querySelector('#editable')
+  
+            expect(editableText).to.be.ok
+
+            await element.updateComplete
+
+            expect(editableText.contentEditable).to.equal('false')
+            element.edit()
+            expect(editableText.contentEditable).to.equal('true')
+          })
+
+          it('should not edit when readOnly', async () => {
+            const element = fixture('ReadOnlyTestFixture')
+            const readOnlyText = element.querySelector('#readonly')
+
+            expect(readOnlyText).to.be.ok
+
+            await element.updateComplete
+            expect(readOnlyText.contentEditable).to.equal('false')
+            element.edit()
+            expect(readOnlyText.contentEditable).to.equal('false')
+          })
+        })
+
+        describe('doneEditing()', () => {
+          it('should render the content non-editable', async () => {
+            const element = fixture('EditableTestFixture')
+            const editableText = element.querySelector('#editable')
+            await element.updateComplete
+            element.edit()
+
+            expect(editableText.contentEditable).to.equal('true')
+            element.doneEditing()
+            expect(editableText.contentEditable).to.equal('false')
+          })
         })
       })
     </script>

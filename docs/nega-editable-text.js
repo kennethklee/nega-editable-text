@@ -28,19 +28,24 @@ class NegaEditableText extends LitElement {
       editable: {
         type: Boolean,
         reflect: true
+      },
+      readOnly: {
+        type: Boolean,
+        reflect: true
       }
     };
   }
 
   constructor() {
     super();
+    this.readOnly = false;
     this.editable = false;
     this._bound = {}; // Keep reference of bound event handlers for disconnect
   }
 
   render() {
     return html`
-    <slot id="text"><span id="default"></span></slot>
+    <slot id="text" @slotchange=${this._handleSlotChange}><span id="default"></span></slot>
     `;
   }
   /**
@@ -60,24 +65,18 @@ class NegaEditableText extends LitElement {
 
   firstUpdated() {
     this._bound.onPaste = this._handleTextPaste.bind(this);
-    this._bound.onKeyDown = this._handleTextKeyDown.bind(this);
-    this._bound.onBlur = this._handleTextBlur.bind(this);
     this.contentElement.addEventListener('paste', this._bound.onPaste);
-    this.contentElement.addEventListener('keydown', this._bound.onKeyDown);
-    this.contentElement.addEventListener('blur', this._bound.onBlur);
   }
 
   disconnectedCallback() {
     if (!this.contentElement) return; // no events to remove
 
     this.contentElement.removeEventListener('paste', this._bound.onPaste);
-    this.contentElement.removeEventListener('keydown', this._bound.onKeyDown);
-    this.contentElement.removeEventListener('blur', this._bound.onBlur);
   }
 
   updated(changed) {
-    if (changed.has('editable')) {
-      this.contentElement.contentEditable = this.editable;
+    if (changed.has('editable') || changed.has('readOnly')) {
+      this.editable && !this.readOnly ? this.edit() : this.doneEditing();
     }
   }
   /**
@@ -86,13 +85,23 @@ class NegaEditableText extends LitElement {
 
 
   edit() {
-    // Allow focusable
-    if (this.contentElement.tabIndex) {
+    if (this.readOnly) return; // Allow focusable
+
+    if (this.contentElement.hasAttribute('tabIndex')) {
       this._textTabIndex = this.contentElement.tabIndex;
     }
 
     this.contentElement.tabIndex = 0;
+    this.contentElement.contentEditable = true;
     this.editable = true;
+    this.dispatchEvent(new CustomEvent('edit', {
+      detail: {
+        value: this.innerText,
+        target: this.contentElement
+      },
+      composed: true,
+      bubbles: true
+    }));
   }
   /**
    * Finished editing.
@@ -107,8 +116,9 @@ class NegaEditableText extends LitElement {
       this.contentElement.removeAttribute('tabindex');
     }
 
-    this.editable = false;
     this.contentElement.blur();
+    this.contentElement.contentEditable = false;
+    this.editable = false;
     this.dispatchEvent(new CustomEvent('change', {
       detail: {
         value: this.innerText,
@@ -119,23 +129,26 @@ class NegaEditableText extends LitElement {
     }));
   }
 
-  _handleFocus(ev) {
-    setTimeout(_ => this.contentElement.focus(), 100);
-  }
+  _handleSlotChange(ev) {
+    if (this.contentElement.innerHTML !== this.contentElement.innerText) {
+      this.contentElement.innerHTML = this.contentElement.innerText; // Strip nested tags
+    }
+  } // Source (with adjustments): https://stackoverflow.com/a/34876744
+
 
   _handleTextPaste(ev) {
     ev.preventDefault();
-  }
+    var text = '';
 
-  _handleTextKeyDown(ev) {
-    if (ev.key === 'Enter') {
-      ev.preventDefault();
-      this.doneEditing();
+    if (ev.clipboardData || ev.originalEvent.clipboardData) {
+      text = (ev.originalEvent || ev).clipboardData.getData('text/plain');
+    } else if (window.clipboardData) {
+      text = window.clipboardData.getData('Text');
     }
-  }
 
-  _handleTextBlur(ev) {
-    this.doneEditing();
+    var insertCommand = document.queryCommandSupported('insertText') ? 'insertText' : 'paste';
+    document.execCommand(insertCommand, false, text);
+    return false;
   }
 
 }

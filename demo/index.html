@@ -16,9 +16,11 @@
 
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
-        [editable] {
+        [editable].box {
           display: inline-block;
-          /* border: 1px dotted black; */
+          background: yellow;
+          border: 3px inset grey;
+          border-radius: 2px;
         }
       </style>
     </custom-style>
@@ -38,10 +40,12 @@
     </div>
 
     <div class="vertical-section-container centered">
-      <h3>Edit toggle with complex elements elements</h3>
+      <h3>Complex, styled demo with edit button</h3>
       <demo-snippet>
         <template>
-          <nega-editable-text onkeydown="event.key==='Enter' && this.doneEditing()" onblur="this.doneEditing()"><div>The <strong>nested elements</strong> are <code>stripped</code>.</div></nega-editable-text>
+          <nega-editable-text class="box" onkeydown="event.key==='Enter' && this.doneEditing()" onblur="this.doneEditing()">
+            <span>The <strong>nested elements</strong> are <code>stripped</code>.</span>
+          </nega-editable-text>
           <button onclick="this.previousElementSibling.edit(); setTimeout(_ => this.previousElementSibling.children[0].focus(), 0)">Edit</button>
         </template>
       </demo-snippet>
@@ -61,7 +65,7 @@
         <demo-snippet>
           <template>
             <nega-editable-text readonly editable><span>This text is not editable.</h4></nega-editable-text>
-            <button onclick="this.previousElementSibling.edit(); setTimeout(_ => this.previousElementSibling.children[0].focus(), 0)">Edit</button>
+            <button onclick="this.previousElementSibling.edit()">Edit</button>
           </template>
         </demo-snippet>
       </div>

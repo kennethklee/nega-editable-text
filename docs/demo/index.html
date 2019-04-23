@@ -12,9 +12,11 @@ import '../nega-editable-text.js';</script>
 
     </head><custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
-        [editable] {
+        [editable].box {
           display: inline-block;
-          border: 1px dotted black;
+          background: yellow;
+          border: 3px inset grey;
+          border-radius: 2px;
         }
       </style>
     </custom-style>
@@ -28,34 +30,41 @@ import '../nega-editable-text.js';</script>
       <h3>Basic nega-editable-text demo</h3>
       <demo-snippet>
         <template>
-          <nega-editable-text><span>This text can be editable.</span></nega-editable-text>
-          <button onclick="this.previousElementSibling.edit(); setTimeout(_ => this.previousElementSibling.children[0].focus(), 0)">Edit</button>
-          <!-- TODO: Fix weird focus hack -->
+          <nega-editable-text editable=""><span>This text can be editable.</span></nega-editable-text>
         </template>
       </demo-snippet>
     </div>
 
     <div class="vertical-section-container centered">
-      <h3>Nested elements nega-editable-text demo</h3>
+      <h3>Complex, styled demo with edit button</h3>
       <demo-snippet>
         <template>
-          <nega-editable-text><span>This <strong>text</strong> can be <code>editable</code>.</span></nega-editable-text>
+          <nega-editable-text class="box" onkeydown="event.key==='Enter' &amp;&amp; this.doneEditing()" onblur="this.doneEditing()">
+            <span>The <strong>nested elements</strong> are <code>stripped</code>.</span>
+          </nega-editable-text>
           <button onclick="this.previousElementSibling.edit(); setTimeout(_ => this.previousElementSibling.children[0].focus(), 0)">Edit</button>
-          <!-- TODO: Fix weird focus hack -->
         </template>
       </demo-snippet>
     </div>
 
     <div class="vertical-section-container centered">
-      <h3>Editable header nega-editable-text demo</h3>
+      <h3>Editable header</h3>
       <demo-snippet>
         <template>
-          <nega-editable-text><h4>Header Title</h4></nega-editable-text>
-          <button onclick="this.previousElementSibling.edit(); setTimeout(_ => this.previousElementSibling.children[0].focus(), 0)">Edit</button>
-          <!-- TODO: Fix weird focus hack -->
+          <nega-editable-text editable=""><h4>Edit Header Title</h4></nega-editable-text>
         </template>
       </demo-snippet>
     </div>
+
+    <div class="vertical-section-container centered">
+        <h3>Read only text</h3>
+        <demo-snippet>
+          <template>
+            <nega-editable-text readonly="" editable=""><span>This text is not editable.</span></nega-editable-text>
+            <button onclick="this.previousElementSibling.edit()">Edit</button>
+          </template>
+        </demo-snippet>
+      </div>
   
 
 </html>
