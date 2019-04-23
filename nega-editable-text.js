@@ -114,8 +114,18 @@ class NegaEditableText extends  LitElement {
     setTimeout(_ => this.contentElement.focus(), 100)
   }
 
+  // Source (with adjustments): https://stackoverflow.com/a/34876744
   _handleTextPaste(ev) {
     ev.preventDefault()
+    var text = ''
+    if (ev.clipboardData || ev.originalEvent.clipboardData) {
+      text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
+    } else if (window.clipboardData) {
+      text = window.clipboardData.getData('Text')
+    }
+    var insertCommand = document.queryCommandSupported('insertText') ? 'insertText' : 'paste'
+    document.execCommand(insertCommand, false, text)
+    return false
   }
 
   _handleTextKeyDown(ev) {
