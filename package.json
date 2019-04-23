@@ -1,6 +1,6 @@
 {
   "name": "nega-editable-text",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Inline plain text editing webcomponent",
   "main": "nega-editable-text.js",
   "scripts": {
