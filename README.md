@@ -37,12 +37,12 @@ npm install --save nega-editable-text
 
 ```js
 import {PolymerElement, html} from '@polymer/polymer';
-import 'nega-autocomplete/nega-autocomplete.js';
+import 'nega-editable-text/nega-editable-text.js';
 
 class SampleElement extends PolymerElement {
   static get template() {
     return html`
-        <nega-editable-text id="editalbe"><span id="text">This text can be editable.</span></nega-editable-text>
+        <nega-editable-text id="editable"><span id="text">This text can be editable.</span></nega-editable-text>
         <button on-click="_handleEdit">Edit</button>
     `;
   }
